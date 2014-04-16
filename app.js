@@ -5,7 +5,8 @@ app.http().io();
 
 app.io.route('ready', function(req) {
     req.io.join(req.handshake.address.address);
-    req.io.room(req.handshake.address.address).broadcast('announce')
+    req.io.room(req.handshake.address.address).broadcast('announce');
+
 });
 
 app.io.route('update', function(req) {
