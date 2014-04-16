@@ -1,17 +1,17 @@
 app = require('express.io')();
 app.http().io();
-
+app.enable('trust proxy')
 // Setup the ready route, join room and broadcast to room.
 
 app.io.route('ready', function(req) {
-    req.io.join(req.handshake.address.address);
-    req.io.room(req.handshake.address.address).broadcast('announce');
+    req.io.join(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address);
+    req.io.room(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address).broadcast('announce');
 
 });
 
 app.io.route('update', function(req) {
-    console.log(req.handshake.address.address + '' + req.data)
-    req.io.room(req.handshake.address.address).broadcast('update', {message: req.data});
+    console.log(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address + '' + req.data)
+    req.io.room(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address).broadcast('update', {message: req.data});
 });
 
 // Send the client html.
