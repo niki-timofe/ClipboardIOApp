@@ -6,9 +6,6 @@
         "start": "node app.js"
     },
     "dependencies": {
-        "express":         "*",
-        "jade":            "*",
-        "less-middleware": "*",
         "express.io":      "*"
     }
 }
