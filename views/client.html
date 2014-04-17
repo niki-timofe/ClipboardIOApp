@@ -27,5 +27,9 @@
 
     tArea.bind('click', function() {
         tArea.select();
-    })
+    });
+
+    $(window).on('hashchange', function() {
+        location.reload();
+    });
 </script>
