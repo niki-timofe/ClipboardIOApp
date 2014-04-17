@@ -1,6 +1,12 @@
-app = require('express.io')();
+var express = require('express.io'), path = require('path'), lessMiddleware = require('less-middleware');
+
+app = express();
 app.http().io();
-app.enable('trust proxy')
+
+app.enable('trust proxy');
+app.use(require('less-middleware')(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Setup the ready route, join room and broadcast to room.
 
 app.io.route('ready', function(req) {
