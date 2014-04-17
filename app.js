@@ -18,7 +18,7 @@ app.io.route('ready', function(req) {
 
 app.io.route('update', function(req) {
     var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
-    req.io.room(room).broadcast('update', {message: req.data});
+    req.io.room(room).broadcast('update', {message: req.data.message});
 });
 
 // Send the client html.
