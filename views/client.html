@@ -9,6 +9,8 @@
     var tArea = $('#text');
     tArea.focus();
 
+    tArea.val(window.location.hash);
+
     io = io.connect();
     io.emit('ready', {"room": window.location.hash});
 

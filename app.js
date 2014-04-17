@@ -11,14 +11,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.io.route('ready', function(req) {
     var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
-    console.log(room);
     req.io.join(room);
     req.io.room(room).broadcast('announce');
 
 });
 
 app.io.route('update', function(req) {
-    req.io.room(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address).broadcast('update', {message: req.data});
+    var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
+    req.io.room(room).broadcast('update', {message: req.data});
 });
 
 // Send the client html.
