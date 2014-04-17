@@ -1,4 +1,4 @@
-var express = require('express.io'), path = require('path'), lessMiddleware = require('less-middleware');
+var express = require('express.io'), path = require('path'), lessMiddleware = require('less-middleware'), url = require("url");
 
 app = express();
 app.http().io();
@@ -10,8 +10,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Setup the ready route, join room and broadcast to room.
 
 app.io.route('ready', function(req) {
-    req.io.join(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address);
-    req.io.room(req.handshake.headers['x-forwarded-for'] || req.handshake.address.address).broadcast('announce');
+    var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
+    console.log(room);
+    req.io.join(room);
+    req.io.room(room).broadcast('announce');
 
 });
 
@@ -20,7 +22,7 @@ app.io.route('update', function(req) {
 });
 
 // Send the client html.
-app.get('/', function(req, res) {
+app.get('/*', function(req, res) {
     res.sendfile(__dirname + '/views/client.html')
 });
 

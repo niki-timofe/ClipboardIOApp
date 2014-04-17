@@ -6,18 +6,26 @@
 <textarea id="text"></textarea>
 
 <script>
+    var tArea = $('#text');
+    tArea.focus();
+
     io = io.connect();
-    io.emit('ready');
+    io.emit('ready', {"room": window.location.hash});
 
     io.on('announce', function() {
         io.emit('update', $('#text').val())
     });
 
     io.on('update', function(data) {
-        $('#text').val(data.message)
+        tArea.val(data.message);
+        tArea.blur();
     });
 
-    $('#text').bind('input', function() {
+    tArea.bind('input', function() {
         io.emit('update', $('#text').val())
+    })
+
+    tArea.bind('click', function() {
+        tArea.select();
     })
 </script>
