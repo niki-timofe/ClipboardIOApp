@@ -26,10 +26,6 @@
         io.emit('update', {"message": $('#text').val(), "room": window.location.hash})
     });
 
-    tArea.bind('click', function() {
-        tArea.select();
-    });
-
     $(window).on('hashchange', function() {
         location.reload();
     });
