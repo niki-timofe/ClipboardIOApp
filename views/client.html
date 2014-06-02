@@ -11,10 +11,10 @@
     tArea.focus();
 
     io = io.connect();
-    io.emit('ready', {"room": window.location.hash});
+    io.emit('ready', {"room": window.location.href});
 
     io.on('announce', function() {
-        io.emit('update', $('#text').val())
+        io.emit('update', {"message": $('#text').val(), "room": window.location.href});
     });
 
     io.on('update', function(data) {
@@ -23,10 +23,6 @@
     });
 
     tArea.bind('input', function() {
-        io.emit('update', {"message": $('#text').val(), "room": window.location.hash})
-    });
-
-    $(window).on('hashchange', function() {
-        location.reload();
+        io.emit('update', {"message": $('#text').val(), "room": window.location.href})
     });
 </script>
