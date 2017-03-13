@@ -11,7 +11,6 @@ var express = require('express'),
 /**
  * Init app
  */
-
 var app = express(),
     server = http.Server(app),
     io = require('socket.io')(server);
@@ -20,15 +19,19 @@ var app = express(),
 /**
  * Use LESS-static
  */
-
 app.use(less(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
 /**
+ * For Heroku proxies
+ */
+app.enable('trust proxy');
+
+
+/**
  * Send client-side
  */
-
 app.get('/*', function (req, res) {
     res.sendFile(__dirname + '/views/client.html')
 });
@@ -37,11 +40,10 @@ app.get('/*', function (req, res) {
 /**
  * Sockets
  */
-
-
 io.on('connection', function (socket) {
     var path = url.parse(socket.request.headers.referer).path;
-    var room = path == '/' ? socket.handshake.address : path;
+    var room = path == '/' ? socket.request.headers['x-forwarded-for'] : path;
+    console.log('Connection to ', room, socket.request.headers['x-forwarded-for']);
     socket.join(room);
 
     socket.emit('joined', {room: room});
