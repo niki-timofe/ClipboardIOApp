@@ -1,29 +1,61 @@
-var express = require('express.io'), path = require('path'), lessMiddleware = require('less-middleware'), url = require("url");
+"use strict";
 
-app = express();
-app.http().io();
+var express = require('express'),
+    path = require('path'),
+    less = require('less-middleware'),
+    crypto = require('crypto'),
+    url = require('url'),
+    http = require('http');
 
-app.enable('trust proxy');
-app.use(require('less-middleware')(__dirname + '/public'));
+
+/**
+ * Init app
+ */
+
+var app = express(),
+    server = http.Server(app),
+    io = require('socket.io')(server);
+
+
+/**
+ * Use LESS-static
+ */
+
+app.use(less(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Setup the ready route, join room and broadcast to room.
 
-app.io.route('ready', function(req) {
-    var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
-    req.io.join(room);
-    req.io.room(room).broadcast('announce');
+/**
+ * Send client-side
+ */
 
+app.get('/*', function (req, res) {
+    res.sendFile(__dirname + '/views/client.html')
 });
 
-app.io.route('update', function(req) {
-    var room = req.data.room || req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;
-    req.io.room(room).broadcast('update', {message: req.data.message});
+
+/**
+ * Sockets
+ */
+
+
+io.on('connection', function (socket) {
+    var path = url.parse(socket.request.headers.referer).path;
+    var room = path == '/' ? socket.handshake.address : path;
+    socket.join(room);
+
+    socket.emit('joined', {room: room});
+
+    socket.on('ready', function () {
+        socket.to(room).emit('announce');
+    });
+
+    socket.on('update', function (mes) {
+        socket.broadcast.to(room).emit('update', mes);
+    });
 });
 
-// Send the client html.
-app.get('/*', function(req, res) {
-    res.sendfile(__dirname + '/views/client.html')
-});
 
-app.listen(Number(process.env.PORT || 5000));
+server.listen(Number(process.env.PORT || 5000), function () {
+    console.log('Listening on port ' + Number(process.env.PORT || 5000))
+});

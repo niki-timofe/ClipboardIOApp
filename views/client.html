@@ -7,22 +7,27 @@
 <textarea id="text"></textarea>
 
 <script>
-    var tArea = $('#text');
-    tArea.focus();
+    var text = $('#text');
+    text.focus();
 
-    io = io.connect();
-    io.emit('ready', {"room": window.location.href});
+    var socket = io();
+    var room;
 
-    io.on('announce', function() {
-        io.emit('update', {"message": $('#text').val(), "room": window.location.href});
+    socket.on('joined', function (msg) {
+        room = msg.room;
+        socket.emit('ready');
     });
 
-    io.on('update', function(data) {
-        tArea.val(data.message);
-        tArea.blur();
+    socket.on('announce', function () {
+        socket.emit('update', text.val());
     });
 
-    tArea.bind('input', function() {
-        io.emit('update', {"message": $('#text').val(), "room": window.location.href})
+    socket.on('update', function (msg) {
+        text.val(msg);
+        text.blur();
+    });
+
+    text.bind('input', function () {
+        socket.emit('update', text.val())
     });
 </script>
